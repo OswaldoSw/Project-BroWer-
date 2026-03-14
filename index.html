@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<meta name="theme-color" content="#0d0d0f"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Flow"/>
+<title>Flow — Tu vida organizada</title>
+<link rel="manifest" href="manifest.json"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#0d0d0f;
+  --bg1:#141416;
+  --bg2:#1a1a1d;
+  --bg3:#222226;
+  --bg4:#2a2a2f;
+  --border:#2e2e34;
+  --border2:#3a3a42;
+  --txt:#f0f0f5;
+  --txt2:#a0a0b0;
+  --txt3:#606070;
+  --accent:#6c63ff;
+  --accent2:#8b84ff;
+  --accent-glow:rgba(108,99,255,0.25);
+  --green:#22c55e;
+  --green-dim:#16a34a;
+  --red:#ef4444;
+  --yellow:#eab308;
+  --orange:#f97316;
+  --cyan:#06b6d4;
+  --pink:#ec4899;
+  --r:14px;
+  --r2:10px;
+  --r3:8px;
+  --nav:68px;
+  --hdr:60px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overscroll-behavior:none}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--txt);font-size:15px;line-height:1.5;overflow:hidden}
+
+/* ─── LAYOUT ─── */
+#app{display:flex;flex-direction:column;height:100dvh;max-width:430px;margin:0 auto;position:relative}
+
+/* ─── HEADER ─── */
+header{height:var(--hdr);display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:var(--bg);border-bottom:1px solid var(--border);flex-shrink:0;position:relative;z-index:10}
+.logo{font-size:22px;font-weight:700;letter-spacing:-0.5px;color:var(--txt)}
+.logo span{color:var(--accent)}
+.header-right{display:flex;align-items:center;gap:10px}
+.avatar{width:34px;height:34px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#fff}
+.hdr-date{font-size:12px;color:var(--txt3);text-align:right;line-height:1.3}
+
+/* ─── PAGES ─── */
+#pages{flex:1;overflow:hidden;position:relative}
+.page{position:absolute;inset:0;overflow-y:auto;padding:16px 16px calc(var(--nav)+16px);display:none;animation:pgIn .2s ease}
+.page.active{display:block}
+@keyframes pgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.page::-webkit-scrollbar{width:3px}
+.page::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px}
+
+/* ─── BOTTOM NAV ─── */
+nav{height:var(--nav);background:var(--bg1);border-top:1px solid var(--border);display:flex;align-items:stretch;flex-shrink:0;position:relative;z-index:10}
+.nav-btn{flex:1;border:none;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;color:var(--txt3);font-size:10px;font-family:'DM Sans',sans-serif;font-weight:500;transition:color .2s;padding-bottom:4px;position:relative}
+.nav-btn svg{width:22px;height:22px;stroke-width:1.8}
+.nav-btn.active{color:var(--accent)}
+.nav-btn.active::before{content:'';position:absolute;top:0;left:20%;right:20%;height:2px;background:var(--accent);border-radius:0 0 3px 3px}
+.nav-badge{position:absolute;top:8px;right:calc(50% - 18px);width:16px;height:16px;background:var(--red);border-radius:50%;font-size:9px;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700}
+
+/* ─── FAB ─── */
+.fab{position:absolute;bottom:calc(var(--nav)+14px);right:16px;z-index:50;width:50px;height:50px;background:var(--accent);border:none;border-radius:50%;color:#fff;font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px var(--accent-glow);transition:transform .2s,box-shadow .2s}
+.fab:active{transform:scale(.93)}
+
+/* ─── CARDS ─── */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:12px}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.card-title{font-weight:600;font-size:14px;color:var(--txt2)}
+
+/* ─── SECTION LABEL ─── */
+.sec-label{font-size:11px;font-weight:600;color:var(--txt3);text-transform:uppercase;letter-spacing:1.2px;margin:0 0 10px}
+
+/* ─── BUTTONS ─── */
+.btn{border:none;border-radius:var(--r3);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;transition:all .15s;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btn-primary{background:var(--accent);color:#fff;padding:13px 20px;width:100%;border-radius:var(--r2);font-size:15px;font-weight:600}
+.btn-primary:active{background:var(--accent2)}
+.btn-ghost{background:var(--bg3);color:var(--txt2);padding:8px 14px;font-size:13px;border:1px solid var(--border)}
+.btn-ghost:active{background:var(--bg4)}
+.btn-icon{background:none;border:none;cursor:pointer;color:var(--txt3);padding:6px;border-radius:6px;display:flex;align-items:center;justify-content:center;transition:color .15s}
+.btn-icon:active{color:var(--txt);background:var(--bg3)}
+
+/* ─── PILL BADGES ─── */
+.pill{display:inline-flex;align-items:center;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:600;gap:4px}
+.pill-pending{background:rgba(234,179,8,.15);color:var(--yellow);border:1px solid rgba(234,179,8,.3)}
+.pill-progress{background:rgba(6,182,212,.15);color:var(--cyan);border:1px solid rgba(6,182,212,.3)}
+.pill-done{background:rgba(34,197,94,.15);color:var(--green);border:1px solid rgba(34,197,94,.3)}
+.pill-urgent{background:rgba(239,68,68,.15);color:var(--red);border:1px solid rgba(239,68,68,.3)}
+
+/* ─── CHECK ROW ─── */
+.check-row{display:flex;align-items:flex-start;gap:12px;padding:11px 0;border-bottom:1px solid var(--border)}
+.check-row:last-child{border-bottom:none;padding-bottom:0}
+.check-row:first-child{padding-top:0}
+.chk{width:20px;height:20px;border:2px solid var(--border2);border-radius:5px;flex-shrink:0;margin-top:1px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.chk.done{background:var(--green);border-color:var(--green)}
+.chk.done::after{content:'';width:5px;height:9px;border:2px solid #fff;border-top:none;border-left:none;transform:rotate(45deg) translate(-1px,-1px);display:block}
+.chk-circle{border-radius:50%}
+.row-text{flex:1;min-width:0}
+.row-main{font-size:15px;font-weight:500;line-height:1.3}
+.row-main.done{text-decoration:line-through;color:var(--txt3)}
+.row-sub{font-size:12px;color:var(--txt3);margin-top:2px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+
+/* ─── PROGRESS ─── */
+.prog-wrap{background:var(--bg3);border-radius:4px;height:6px;overflow:hidden;flex:1}
+.prog-fill{height:100%;border-radius:4px;transition:width .4s ease}
+
+/* ─── TABS ─── */
+.tabs{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;padding-bottom:2px}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:6px 14px;border-radius:20px;border:1px solid var(--border);background:none;color:var(--txt3);font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;white-space:nowrap;transition:all .15s}
+.tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+/* ─── HABIT DAYS ─── */
+.habit-days{display:flex;gap:4px;margin-top:8px}
+.hday{width:32px;height:32px;border-radius:7px;border:1.5px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--txt3);cursor:pointer;transition:all .15s;flex-direction:column;gap:1px}
+.hday .dlabel{font-size:9px}
+.hday.done{background:var(--green-dim);border-color:var(--green);color:#fff}
+.hday.today{border-color:var(--accent);border-width:2px;color:var(--accent)}
+.hday.today.done{background:var(--accent);border-color:var(--accent);color:#fff}
+
+/* ─── NOTA CARD ─── */
+.nota-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:border-color .2s;position:relative;overflow:hidden}
+.nota-card:active{border-color:var(--accent)}
+.nota-accent{position:absolute;top:0;left:0;bottom:0;width:3px}
+.nota-title{font-weight:600;font-size:15px;margin-bottom:4px}
+.nota-prev{font-size:13px;color:var(--txt3);overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.nota-meta{font-size:11px;color:var(--txt3);margin-top:8px;display:flex;justify-content:space-between}
+
+/* ─── POMODORO ─── */
+.pomo-ring{position:relative;width:200px;height:200px;margin:0 auto}
+.pomo-ring svg{transform:rotate(-90deg)}
+.pomo-ring circle{fill:none}
+.pomo-track{stroke:var(--bg3);stroke-width:12}
+.pomo-prog{stroke:var(--accent);stroke-width:12;stroke-linecap:round;transition:stroke-dashoffset .5s linear;stroke-dasharray:565.5}
+.pomo-label{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.pomo-time{font-family:'DM Mono',monospace;font-size:36px;font-weight:500;letter-spacing:2px}
+.pomo-phase{font-size:12px;color:var(--txt3);font-weight:600;text-transform:uppercase;letter-spacing:1px}
+.pomo-btns{display:flex;gap:10px;justify-content:center;margin-top:16px}
+.pomo-btn{width:52px;height:52px;border-radius:50%;border:none;cursor:pointer;font-size:20px;display:flex;align-items:center;justify-content:center;transition:transform .15s}
+.pomo-btn:active{transform:scale(.92)}
+
+/* ─── CLIMA WIDGET ─── */
+.clima-widget{background:linear-gradient(135deg,#1a1a2e,#16213e);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:12px;display:flex;align-items:center;gap:16px}
+.clima-temp{font-size:48px;font-weight:300;line-height:1}
+.clima-info .city{font-weight:600;font-size:16px}
+.clima-info .desc{font-size:13px;color:var(--txt2);margin-top:2px}
+.clima-info .feels{font-size:12px;color:var(--txt3)}
+
+/* ─── CALIFICACIONES ─── */
+.grade-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.grade-row:last-child{border-bottom:none}
+.grade-materia{flex:1;font-weight:500}
+.grade-val{font-family:'DM Mono',monospace;font-size:18px;font-weight:500;min-width:44px;text-align:right}
+.grade-bar-wrap{width:80px}
+.grade-avg-big{font-family:'DM Mono',monospace;font-size:52px;font-weight:300;text-align:center;line-height:1}
+.grade-avg-label{text-align:center;font-size:12px;color:var(--txt3);margin-top:4px;text-transform:uppercase;letter-spacing:1px}
+
+/* ─── COMPRAS ─── */
+.shop-category{margin-bottom:14px}
+.shop-cat-title{font-size:13px;font-weight:600;color:var(--txt3);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+
+/* ─── STAT CHIPS ─── */
+.stats-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.stat-chip{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:14px;display:flex;flex-direction:column;gap:4px}
+.stat-num{font-size:28px;font-weight:700;font-family:'DM Mono',monospace;line-height:1}
+.stat-label{font-size:11px;color:var(--txt3);text-transform:uppercase;letter-spacing:.8px}
+
+/* ─── SHEET (bottom modal) ─── */
+.sheet-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;display:none;align-items:flex-end;backdrop-filter:blur(3px)}
+.sheet-overlay.open{display:flex;animation:fadeO .2s ease}
+@keyframes fadeO{from{opacity:0}to{opacity:1}}
+.sheet{background:var(--bg1);border-top:1px solid var(--border);border-radius:24px 24px 0 0;padding:0 20px 40px;width:100%;max-width:430px;margin:0 auto;max-height:90dvh;overflow-y:auto;animation:slideU .25s cubic-bezier(.32,.72,0,1)}
+@keyframes slideU{from{transform:translateY(100%)}to{transform:none}}
+.sheet-handle{width:36px;height:4px;background:var(--bg4);border-radius:2px;margin:12px auto 20px}
+.sheet-title{font-size:18px;font-weight:700;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center}
+
+/* ─── FORM ─── */
+.fg{margin-bottom:14px}
+.fg label{display:block;font-size:12px;font-weight:600;color:var(--txt3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px}
+.fg input,.fg select,.fg textarea{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r3);padding:12px 14px;font-family:'DM Sans',sans-serif;font-size:15px;color:var(--txt);outline:none;transition:border-color .2s;-webkit-appearance:none}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--accent)}
+.fg textarea{min-height:90px;resize:vertical;line-height:1.5}
+.fg select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23606070' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
+.fg select option{background:var(--bg2)}
+.color-grid{display:flex;gap:8px;flex-wrap:wrap}
+.color-dot{width:30px;height:30px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:transform .15s}
+.color-dot.sel{border-color:#fff;transform:scale(1.15)}
+.switch-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0}
+.switch-row label{font-size:14px;font-weight:500}
+.switch{width:44px;height:24px;background:var(--bg4);border-radius:12px;position:relative;cursor:pointer;transition:background .2s;border:none}
+.switch.on{background:var(--accent)}
+.switch::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;background:#fff;border-radius:50%;transition:left .2s}
+.switch.on::after{left:23px}
+
+/* ─── NOTE FULL ─── */
+.note-full{position:fixed;inset:0;z-index:300;background:var(--bg);display:none;flex-direction:column}
+.note-full.open{display:flex;animation:fadeIn .2s ease}
+.note-full-hdr{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border);flex-shrink:0}
+.note-full-hdr input{flex:1;background:none;border:none;font-family:'DM Sans',sans-serif;font-size:20px;font-weight:700;color:var(--txt);outline:none}
+.note-full textarea{flex:1;background:none;border:none;padding:18px 16px;font-family:'DM Sans',sans-serif;font-size:16px;color:var(--txt);resize:none;outline:none;line-height:1.7}
+
+/* ─── EMPTY ─── */
+.empty-state{text-align:center;padding:40px 20px;color:var(--txt3)}
+.empty-state .icon{font-size:44px;margin-bottom:10px}
+.empty-state p{font-size:14px}
+
+/* ─── ANIMATIONS ─── */
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.slide-in{animation:pgIn .2s ease}
+
+/* ─── HOME GRID ─── */
+.home-section{margin-bottom:20px}
+.quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.quick-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:16px;cursor:pointer;transition:border-color .2s;display:flex;flex-direction:column;gap:8px}
+.quick-card:active{border-color:var(--accent)}
+.quick-card .qc-icon{font-size:26px}
+.quick-card .qc-title{font-weight:600;font-size:14px}
+.quick-card .qc-sub{font-size:12px;color:var(--txt3)}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="logo">Flow<span>.</span></div>
+    <div class="header-right">
+      <div class="hdr-date" id="hdrDate"></div>
+      <div class="avatar">O</div>
+    </div>
+  </header>
+
+  <div id="pages">
+
+    <!-- ═══ HOME ═══ -->
+    <div class="page active" id="pg-home">
+      <div class="stats-row" id="homeStats"></div>
+      <div class="home-section">
+        <div class="sec-label">Acceso rápido</div>
+        <div class="quick-grid">
+          <div class="quick-card" onclick="goTo('tareas')">
+            <div class="qc-icon">📚</div>
+            <div class="qc-title">Tareas</div>
+            <div class="qc-sub" id="qc-tareas">—</div>
+          </div>
+          <div class="quick-card" onclick="goTo('hoy')">
+            <div class="qc-icon">☀️</div>
+            <div class="qc-title">Hoy</div>
+            <div class="qc-sub" id="qc-hoy">—</div>
+          </div>
+          <div class="quick-card" onclick="goTo('pomodoro')">
+            <div class="qc-icon">🍅</div>
+            <div class="qc-title">Pomodoro</div>
+            <div class="qc-sub" id="qc-pomo">Enfócate</div>
+          </div>
+          <div class="quick-card" onclick="goTo('habitos')">
+            <div class="qc-icon">🔥</div>
+            <div class="qc-title">Hábitos</div>
+            <div class="qc-sub" id="qc-habitos">—</div>
+          </div>
+          <div class="quick-card" onclick="goTo('notas')">
+            <div class="qc-icon">📝</div>
+            <div class="qc-title">Notas</div>
+            <div class="qc-sub" id="qc-notas">—</div>
+          </div>
+          <div class="quick-card" onclick="goTo('calificaciones')">
+            <div class="qc-icon">🎓</div>
+            <div class="qc-title">Calificaciones</div>
+            <div class="qc-sub" id="qc-calf">—</div>
+          </div>
+          <div class="quick-card" onclick="goTo('compras')">
+            <div class="qc-icon">🛒</div>
+            <div class="qc-title">Compras</div>
+            <div class="qc-sub" id="qc-compras">—</div>
+          </div>
+          <div class="quick-card" onclick="goTo('recordatorios')">
+            <div class="qc-icon">⏰</div>
+            <div class="qc-title">Recordatorios</div>
+            <div class="qc-sub" id="qc-recs">—</div>
+          </div>
+        </div>
+      </div>
+      <div class="home-section">
+        <div class="sec-label">Tareas urgentes</div>
+        <div class="card" id="homeUrgentes"></div>
+      </div>
+    </div>
+
+    <!-- ═══ TAREAS ═══ -->
+    <div class="page" id="pg-tareas">
+      <div class="tabs" id="tareasTabs"></div>
+      <div id="tareasList"></div>
+    </div>
+
+    <!-- ═══ HOY ═══ -->
+    <div class="page" id="pg-hoy">
+      <div class="card" style="margin-bottom:14px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <span class="card-title">Progreso del día</span>
+          <span id="hoyPct" style="font-family:'DM Mono',monospace;font-size:13px;color:var(--accent)">0%</span>
+        </div>
+        <div class="prog-wrap"><div class="prog-fill" id="hoyFill" style="width:0%;background:var(--accent)"></div></div>
+        <div id="hoyCount" style="font-size:12px;color:var(--txt3);margin-top:6px">0 de 0 completados</div>
+      </div>
+      <div class="card"><div id="hoyList"></div></div>
+    </div>
+
+    <!-- ═══ HÁBITOS ═══ -->
+    <div class="page" id="pg-habitos">
+      <div id="habitosList"></div>
+    </div>
+
+    <!-- ═══ NOTAS ═══ -->
+    <div class="page" id="pg-notas">
+      <div class="tabs" id="notasTabs"></div>
+      <div id="notasList"></div>
+    </div>
+
+    <!-- ═══ POMODORO ═══ -->
+    <div class="page" id="pg-pomodoro">
+      <div class="card" style="padding:24px 16px">
+        <div class="pomo-ring">
+          <svg width="200" height="200" viewBox="0 0 200 200">
+            <circle class="pomo-track" cx="100" cy="100" r="90"/>
+            <circle class="pomo-prog" id="pomoCircle" cx="100" cy="100" r="90"/>
+          </svg>
+          <div class="pomo-label">
+            <div class="pomo-time" id="pomoTime">25:00</div>
+            <div class="pomo-phase" id="pomoPhase">Enfoque</div>
+          </div>
+        </div>
+        <div class="pomo-btns">
+          <button class="pomo-btn" id="pomoPrev" onclick="pomoPrev()" style="background:var(--bg3);color:var(--txt2)">⏮</button>
+          <button class="pomo-btn" id="pomoPlay" onclick="pomoToggle()" style="background:var(--accent);color:#fff;width:64px;height:64px;font-size:24px">▶</button>
+          <button class="pomo-btn" onclick="pomoReset()" style="background:var(--bg3);color:var(--txt2)">↺</button>
+        </div>
+        <div style="text-align:center;margin-top:14px;font-size:13px;color:var(--txt3)">
+          Sesión <span id="pomoSession" style="color:var(--accent);font-weight:700">1</span> / 4 &nbsp;·&nbsp; 
+          <span id="pomoBreaks" style="color:var(--green)">0 descansos</span>
+        </div>
+      </div>
+      <div class="card" style="margin-top:4px">
+        <div class="card-title" style="margin-bottom:12px">Configuración</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px" id="pomoConfig"></div>
+      </div>
+      <div class="card" style="margin-top:4px">
+        <div class="card-title" style="margin-bottom:10px">Tarea actual</div>
+        <div id="pomoTareaActual" style="font-size:14px;color:var(--txt2)">Ninguna seleccionada</div>
+        <button class="btn-ghost" style="margin-top:10px;width:100%" onclick="openSheet('selTarea')">Seleccionar tarea</button>
+      </div>
+    </div>
+
+    <!-- ═══ CALIFICACIONES ═══ -->
+    <div class="page" id="pg-calificaciones">
+      <div class="card" style="margin-bottom:14px">
+        <div class="grade-avg-big" id="gradeAvg">—</div>
+        <div class="grade-avg-label">Promedio general</div>
+      </div>
+      <div class="card"><div id="gradeList"></div></div>
+    </div>
+
+    <!-- ═══ COMPRAS ═══ -->
+    <div class="page" id="pg-compras">
+      <div class="card" style="margin-bottom:10px;padding:12px 16px">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <span style="font-size:14px;font-weight:600">Total estimado</span>
+          <span id="shopTotal" style="font-family:'DM Mono',monospace;font-size:18px;color:var(--green)">$0</span>
+        </div>
+      </div>
+      <div id="shopList"></div>
+    </div>
+
+    <!-- ═══ RECORDATORIOS ═══ -->
+    <div class="page" id="pg-recordatorios">
+      <div class="card"><div id="recList"></div></div>
+    </div>
+
+  </div>
+
+  <!-- ─── BOTTOM NAV ─── -->
+  <nav>
+    <button class="nav-btn active" onclick="goTo('home',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+      Inicio
+    </button>
+    <button class="nav-btn" onclick="goTo('tareas',this)" id="navTareas">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 12l2 2 4-4"/></svg>
+      Tareas
+    </button>
+    <button class="nav-btn" onclick="goTo('hoy',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="5"/><line x1="12" y1="2" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="22"/><line x1="4.22" y1="4.22" x2="4.93" y2="4.93"/><line x1="19.07" y1="19.07" x2="19.78" y2="19.78"/><line x1="2" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="22" y2="12"/><line x1="4.22" y1="19.78" x2="4.93" y2="19.07"/><line x1="19.07" y1="4.93" x2="19.78" y2="4.22"/></svg>
+      Hoy
+    </button>
+    <button class="nav-btn" onclick="goTo('notas',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>
+      Notas
+    </button>
+    <button class="nav-btn" onclick="goTo('pomodoro',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+      Timer
+    </button>
+  </nav>
+
+  <button class="fab" id="fab" onclick="fabAction()">+</button>
+</div>
+
+<!-- ═══ SHEETS ═══ -->
+<div class="sheet-overlay" id="sheetOverlay" onclick="closeSheetOutside(event)">
+  <div class="sheet" id="sheetBody">
+    <div class="sheet-handle"></div>
+    <div id="sheetContent"></div>
+  </div>
+</div>
+
+<!-- ═══ NOTE FULL SCREEN ═══ -->
+<div class="note-full" id="noteFull">
+  <div class="note-full-hdr">
+    <button class="btn-icon" onclick="closeNote()" style="font-size:18px;color:var(--txt2)">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    </button>
+    <input type="text" id="noteTitleInput" placeholder="Título de la nota..."/>
+    <button class="btn-icon" onclick="saveNote()" style="color:var(--green)">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg>
+    </button>
+    <button class="btn-icon" onclick="deleteNote()" style="color:var(--red)">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3,6 5,6 21,6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+    </button>
+  </div>
+  <textarea id="noteBodyInput" placeholder="Empieza a escribir..."></textarea>
+</div>
+
+<script>
+// ═══════════════════════════════
+//  DATA LAYER
+// ═══════════════════════════════
+const DB = {
+  get(k,d){try{return JSON.parse(localStorage.getItem('flow_'+k))||d}catch{return d}},
+  set(k,v){localStorage.setItem('flow_'+k,JSON.stringify(v))}
+};
+
+const MATERIAS = ['Diseño Gráfico','Ética y Sustentabilidad','Literatura','Proyecto de Vida','Web Design','Matemáticas','Inglés','Otra'];
+const COLORES = ['#6c63ff','#22c55e','#ef4444','#eab308','#f97316','#06b6d4','#ec4899','#a78bfa'];
+const SHOP_CATS = ['🥦 Despensa','🧴 Higiene','🎓 Escuela','🏠 Casa','👕 Ropa','📦 Otro'];
+
+let tareas = DB.get('tareas',[
+  {id:1,nombre:'Dimensión 2 – Identidad Corporativa',materia:'Diseño Gráfico',estado:'pendiente',urgente:true,fecha:'2025-02-01',notas:''},
+  {id:2,nombre:'Resumen Ética Ambiental',materia:'Ética y Sustentabilidad',estado:'listo',urgente:false,fecha:'',notas:''},
+  {id:3,nombre:'Análisis literario La Llorona',materia:'Literatura',estado:'en-proceso',urgente:false,fecha:'2025-01-28',notas:'Comparar con El cuento de Navidad'},
+]);
+let hoy = DB.get('hoy',[
+  {id:1,texto:'Ir al gym',done:false},
+  {id:2,texto:'Revisar correos',done:false},
+  {id:3,texto:'Estudiar para examen',done:false},
+]);
+let habitos = DB.get('habitos',[
+  {id:1,nombre:'Gym',emoji:'🏋️',dias:{}},
+  {id:2,nombre:'Leer 20 min',emoji:'📖',dias:{}},
+  {id:3,nombre:'Tomar agua',emoji:'💧',dias:{}},
+]);
+let notas = DB.get('notas',[
+  {id:1,titulo:'Ideas proyecto web',body:'Animaciones CSS, fondo espacial, fuente typewriter...',color:'#6c63ff',cat:'Personal',fecha:hoy_str()},
+]);
+let grades = DB.get('grades',[
+  {id:1,materia:'Diseño Gráfico',cal:9.2},
+  {id:2,materia:'Ética y Sustentabilidad',cal:8.8},
+  {id:3,materia:'Literatura',cal:9.5},
+]);
+let compras = DB.get('compras',[
+  {id:1,texto:'Leche',cat:'🥦 Despensa',precio:25,done:false},
+  {id:2,texto:'Cuaderno',cat:'🎓 Escuela',precio:40,done:false},
+]);
+let recordatorios = DB.get('recordatorios',[
+  {id:1,titulo:'Entregar tarea Nexus',hora:'08:00',color:'#ef4444',nota:''},
+  {id:2,titulo:'Gym',hora:'17:00',color:'#22c55e',nota:''},
+]);
+let notasCats = DB.get('notasCats',['Personal','Escuela','Ideas','Trabajo']);
+
+function hoy_str(){return new Date().toLocaleDateString('es-MX')}
+function save(){
+  DB.set('tareas',tareas);DB.set('hoy',hoy);DB.set('habitos',habitos);
+  DB.set('notas',notas);DB.set('grades',grades);DB.set('compras',compras);
+  DB.set('recordatorios',recordatorios);DB.set('notasCats',notasCats);
+}
+
+// ═══════════════════════════════
+//  NAV / ROUTING
+// ═══════════════════════════════
+let currentPage = 'home';
+const navMap = {home:'home',tareas:'tareas',hoy:'hoy',habitos:'habitos',notas:'notas',pomodoro:'pomodoro',calificaciones:'calificaciones',compras:'compras',recordatorios:'recordatorios'};
+
+function goTo(page, btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('pg-'+page).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  // find matching nav btn
+  if(btn) btn.classList.add('active');
+  else {
+    const navPages = {home:0,tareas:1,hoy:2,notas:3,pomodoro:4};
+    if(navPages[page]!==undefined) document.querySelectorAll('.nav-btn')[navPages[page]].classList.add('active');
+  }
+  currentPage = page;
+  renderAll();
+}
+
+// ═══════════════════════════════
+//  HEADER
+// ═══════════════════════════════
+function renderHeader(){
+  const now=new Date();
+  const days=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+  const months=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  document.getElementById('hdrDate').innerHTML=`${days[now.getDay()]}<br>${now.getDate()} ${months[now.getMonth()]}`;
+}
+
+// ═══════════════════════════════
+//  HOME
+// ═══════════════════════════════
+function renderHome(){
+  const pending=tareas.filter(t=>t.estado!=='listo').length;
+  const hoyDone=hoy.filter(h=>h.done).length;
+  const streak=habitos.length?Math.max(...habitos.map(h=>calcStreak(h.dias))):0;
+  const avg=grades.length?(grades.reduce((a,g)=>a+g.cal,0)/grades.length).toFixed(1):'—';
+
+  document.getElementById('homeStats').innerHTML=`
+    <div class="stat-chip"><div class="stat-num" style="color:var(--yellow)">${pending}</div><div class="stat-label">Tareas pendientes</div></div>
+    <div class="stat-chip"><div class="stat-num" style="color:var(--green)">${hoyDone}/${hoy.length}</div><div class="stat-label">Completado hoy</div></div>
+    <div class="stat-chip"><div class="stat-num" style="color:var(--orange)">🔥${streak}</div><div class="stat-label">Racha máx. hábitos</div></div>
+    <div class="stat-chip"><div class="stat-num" style="color:var(--accent)">${avg}</div><div class="stat-label">Promedio escolar</div></div>
+  `;
+  document.getElementById('qc-tareas').textContent=`${pending} pendiente${pending!==1?'s':''}`;
+  document.getElementById('qc-hoy').textContent=`${hoyDone}/${hoy.length} hecho${hoyDone!==1?'s':''}`;
+  document.getElementById('qc-habitos').textContent=habitos.length+' hábitos';
+  document.getElementById('qc-notas').textContent=notas.length+' nota'+( notas.length!==1?'s':'');
+  document.getElementById('qc-calf').textContent='Prom. '+avg;
+  document.getElementById('qc-compras').textContent=compras.filter(c=>!c.done).length+' items';
+  document.getElementById('qc-recs').textContent=recordatorios.length+' avisos';
+
+  const urgentes=tareas.filter(t=>t.urgente&&t.estado!=='listo');
+  const hu=document.getElementById('homeUrgentes');
+  if(!urgentes.length){hu.innerHTML='<div class="empty-state" style="padding:16px"><div class="icon">✅</div><p>Sin tareas urgentes</p></div>';return}
+  hu.innerHTML=urgentes.map(t=>`
+    <div class="check-row">
+      <div class="chk ${t.estado==='listo'?'done':''}" onclick="toggleTarea(${t.id})"></div>
+      <div class="row-text">
+        <div class="row-main ${t.estado==='listo'?'done':''}">${t.nombre}</div>
+        <div class="row-sub"><span class="pill pill-urgent">⚡ Urgente</span><span style="font-size:11px;color:var(--txt3)">${t.materia}</span></div>
+      </div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════
+//  TAREAS
+// ═══════════════════════════════
+let tareaFilter='all';
+function renderTareas(){
+  const tabs=['all','pendiente','en-proceso','listo'];
+  const labels=['Todas','Pendientes','En proceso','Listas ✓'];
+  document.getElementById('tareasTabs').innerHTML=tabs.map((t,i)=>`<button class="tab ${tareaFilter===t?'active':''}" onclick="setTareaFilter('${t}')">${labels[i]}</button>`).join('');
+
+  let list=tareaFilter==='all'?tareas:tareas.filter(t=>t.estado===tareaFilter);
+  if(!list.length){document.getElementById('tareasList').innerHTML='<div class="empty-state"><div class="icon">📭</div><p>No hay tareas aquí</p></div>';return}
+
+  // Group by materia
+  const groups={};
+  list.forEach(t=>{if(!groups[t.materia])groups[t.materia]=[];groups[t.materia].push(t)});
+
+  document.getElementById('tareasList').innerHTML=Object.entries(groups).map(([mat,items])=>`
+    <div class="card">
+      <div class="card-header"><span class="card-title" style="color:var(--accent2)">${mat}</span>
+        <span style="font-size:12px;color:var(--txt3)">${items.length} tarea${items.length!==1?'s':''}</span>
+      </div>
+      ${items.map(t=>`
+        <div class="check-row">
+          <div class="chk ${t.estado==='listo'?'done':''}" onclick="cycleTarea(${t.id})"></div>
+          <div class="row-text" onclick="openSheet('editTarea',${t.id})" style="cursor:pointer">
+            <div class="row-main ${t.estado==='listo'?'done':''}">${t.nombre}</div>
+            <div class="row-sub">
+              ${estadoPill(t.estado)}
+              ${t.urgente?'<span class="pill pill-urgent">⚡</span>':''}
+              ${t.fecha?`<span>📅 ${t.fecha}</span>`:''}
+            </div>
+          </div>
+          <button class="btn-icon" onclick="deleteTarea(${t.id})">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3,6 5,6 21,6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>
+          </button>
+        </div>`).join('')}
+    </div>`).join('');
+}
+function estadoPill(e){
+  const map={pendiente:'pill-pending Pendiente',  'en-proceso':'pill-progress En proceso',listo:'pill-done Lista ✓'};
+  const [cls,lbl]=(map[e]||'pill-pending Pendiente').split(' ');
+  return `<span class="pill ${cls}">${lbl}</span>`;
+}
+function setTareaFilter(f){tareaFilter=f;renderTareas()}
+function cycleTarea(id){const t=tareas.find(x=>x.id===id);if(!t)return;const o=['pendiente','en-proceso','listo'];t.estado=o[(o.indexOf(t.estado)+1)%3];save();renderAll()}
+function toggleTarea(id){const t=tareas.find(x=>x.id===id);if(!t)return;t.estado=t.estado==='listo'?'pendiente':'listo';save();renderAll()}
+function deleteTarea(id){if(confirm('¿Eliminar tarea?')){tareas=tareas.filter(x=>x.id!==id);save();renderAll()}}
+
+// ═══════════════════════════════
+//  HOY
+// ═══════════════════════════════
+function renderHoy(){
+  const done=hoy.filter(h=>h.done).length;
+  const total=hoy.length;
+  const pct=total?Math.round(done/total*100):0;
+  document.getElementById('hoyPct').textContent=pct+'%';
+  document.getElementById('hoyFill').style.width=pct+'%';
+  document.getElementById('hoyCount').textContent=`${done} de ${total} completados`;
+
+  if(!hoy.length){document.getElementById('hoyList').innerHTML='<div class="empty-state" style="padding:16px"><div class="icon">☀️</div><p>Agrega algo para hoy</p></div>';return}
+  document.getElementById('hoyList').innerHTML=hoy.map(h=>`
+    <div class="check-row">
+      <div class="chk chk-circle ${h.done?'done':''}" onclick="toggleHoy(${h.id})"></div>
+      <div class="row-main ${h.done?'done':''}" style="flex:1">${h.texto}</div>
+      <button class="btn-icon" onclick="deleteHoy(${h.id})">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3,6 5,6 21,6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>
+      </button>
+    </div>`).join('');
+}
+function toggleHoy(id){const h=hoy.find(x=>x.id===id);if(h){h.done=!h.done;save();renderHoy()}}
+function deleteHoy(id){hoy=hoy.filter(x=>x.id!==id);save();renderHoy()}
+
+// ═══════════════════════════════
+//  HÁBITOS
+// ═══════════════════════════════
+function calcStreak(dias){
+  let s=0;const now=new Date();
+  for(let i=0;i<365;i++){const d=new Date(now);d.setDate(d.getDate()-i);if(dias[d.toISOString().slice(0,10)])s++;else break}return s;
+}
+function renderHabitos(){
+  if(!habitos.length){document.getElementById('habitosList').innerHTML='<div class="empty-state"><div class="icon">🌱</div><p>Agrega tu primer hábito</p></div>';return}
+  const today=new Date();
+  const week=Array.from({length:7},(_,i)=>{const d=new Date(today);d.setDate(d.getDate()-(6-i));return{key:d.toISOString().slice(0,10),lbl:['D','L','M','X','J','V','S'][d.getDay()],isToday:i===6}});
+
+  document.getElementById('habitosList').innerHTML=habitos.map(h=>`
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+        <span style="font-size:28px">${h.emoji}</span>
+        <div style="flex:1">
+          <div style="font-weight:600;font-size:16px">${h.nombre}</div>
+          <div style="font-size:12px;color:var(--orange)">🔥 ${calcStreak(h.dias)} días seguidos</div>
+        </div>
+        <button class="btn-icon" onclick="deleteHabito(${h.id})">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3,6 5,6 21,6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>
+        </button>
+      </div>
+      <div class="habit-days">
+        ${week.map(d=>`<div class="hday ${h.dias[d.key]?'done':''} ${d.isToday?'today':''}" onclick="toggleHabit(${h.id},'${d.key}')">
+          <span>${d.lbl}</span>
+        </div>`).join('')}
+      </div>
+    </div>`).join('');
+}
+function toggleHabit(id,key){const h=habitos.find(x=>x.id===id);if(h){h.dias[key]=!h.dias[key];save();renderHabitos()}}
+function deleteHabito(id){habitos=habitos.filter(x=>x.id!==id);save();renderHabitos()}
+
+// ═══════════════════════════════
+//  NOTAS
+// ═══════════════════════════════
+let notaFilter='all';
+let editingNoteId=null;
+function renderNotas(){
+  const allCats=['all',...notasCats];
+  document.getElementById('notasTabs').innerHTML=allCats.map(c=>`<button class="tab ${notaFilter===c?'active':''}" onclick="setNotaFilter('${c}')">${c==='all'?'Todas':c}</button>`).join('');
+  const list=notaFilter==='all'?notas:notas.filter(n=>n.cat===notaFilter);
+  if(!list.length){document.getElementById('notasList').innerHTML='<div class="empty-state"><div class="icon">📝</div><p>Sin notas aquí</p></div>';return}
+  document.getElementById('notasList').innerHTML=[...list].reverse().map(n=>`
+    <div class="nota-card" onclick="openNoteEditor(${n.id})">
+      <div class="nota-accent" style="background:${n.color}"></div>
+      <div style="padding-left:10px">
+        <div class="nota-title">${n.titulo||'Sin título'}</div>
+        <div class="nota-prev">${n.body||''}</div>
+        <div class="nota-meta"><span>${n.cat||''}</span><span>${n.fecha||''}</span></div>
+      </div>
+    </div>`).join('');
+}
+function setNotaFilter(f){notaFilter=f;renderNotas()}
+function openNoteEditor(id){
+  editingNoteId=id||null;
+  const n=id?notas.find(x=>x.id===id):null;
+  document.getElementById('noteTitleInput').value=n?n.titulo:'';
+  document.getElementById('noteBodyInput').value=n?n.body:'';
+  document.getElementById('noteFull').classList.add('open');
+  setTimeout(()=>document.getElementById('noteBodyInput').focus(),200);
+}
+function closeNote(){document.getElementById('noteFull').classList.remove('open');editingNoteId=null}
+function saveNote(){
+  const titulo=document.getElementById('noteTitleInput').value.trim()||'Sin título';
+  const body=document.getElementById('noteBodyInput').value;
+  if(!body.trim()&&titulo==='Sin título'){closeNote();return}
+  if(editingNoteId){const n=notas.find(x=>x.id===editingNoteId);n.titulo=titulo;n.body=body;n.fecha=hoy_str()}
+  else notas.push({id:Date.now(),titulo,body,color:COLORES[Math.floor(Math.random()*COLORES.length)],cat:notasCats[0]||'Personal',fecha:hoy_str()});
+  save();closeNote();renderNotas();
+}
+function deleteNote(){if(editingNoteId&&confirm('¿Eliminar nota?')){notas=notas.filter(x=>x.id!==editingNoteId);save();closeNote();renderNotas()}}
+
+// ═══════════════════════════════
+//  POMODORO
+// ═══════════════════════════════
+const POMO={focus:25,short:5,long:15};
+let pomoState={running:false,phase:'focus',time:POMO.focus*60,session:1,breaks:0,timer:null,taskId:null};
+const CIRCUM=2*Math.PI*90;
+
+function pomoRender(){
+  const total=pomoState.phase==='focus'?POMO.focus*60:(pomoState.phase==='short'?POMO.short*60:POMO.long*60);
+  const pct=pomoState.time/total;
+  const offset=CIRCUM*(1-pct);
+  document.getElementById('pomoCircle').style.strokeDashoffset=offset;
+  const m=Math.floor(pomoState.time/60).toString().padStart(2,'0');
+  const s=(pomoState.time%60).toString().padStart(2,'0');
+  document.getElementById('pomoTime').textContent=`${m}:${s}`;
+  const phases={focus:'🎯 Enfoque',short:'☕ Descanso',long:'🛋️ Descanso largo'};
+  document.getElementById('pomoPhase').textContent=phases[pomoState.phase]||'';
+  document.getElementById('pomoSession').textContent=pomoState.session;
+  document.getElementById('pomoBreaks').textContent=pomoState.breaks+' descanso'+(pomoState.breaks!==1?'s':'');
+  document.getElementById('pomoPlay').textContent=pomoState.running?'⏸':'▶';
+  const c=pomoState.phase==='focus'?'var(--accent)':pomoState.phase==='short'?'var(--green)':'var(--cyan)';
+  document.getElementById('pomoCircle').style.stroke=c;
+
+  // config
+  document.getElementById('pomoConfig').innerHTML=`
+    <div style="background:var(--bg3);border-radius:8px;padding:10px;text-align:center">
+      <div style="font-size:10px;color:var(--txt3);margin-bottom:4px">ENFOQUE</div>
+      <div style="font-family:'DM Mono',monospace;font-size:18px">${POMO.focus}m</div>
+    </div>
+    <div style="background:var(--bg3);border-radius:8px;padding:10px;text-align:center">
+      <div style="font-size:10px;color:var(--txt3);margin-bottom:4px">DESCANSO</div>
+      <div style="font-family:'DM Mono',monospace;font-size:18px">${POMO.short}m</div>
+    </div>
+    <div style="background:var(--bg3);border-radius:8px;padding:10px;text-align:center">
+      <div style="font-size:10px;color:var(--txt3);margin-bottom:4px">LARGO</div>
+      <div style="font-family:'DM Mono',monospace;font-size:18px">${POMO.long}m</div>
+    </div>`;
+
+  const task=tareas.find(t=>t.id===pomoState.taskId);
+  document.getElementById('pomoTareaActual').textContent=task?task.nombre:'Ninguna seleccionada';
+}
+
+function pomoToggle(){
+  if(pomoState.running){clearInterval(pomoState.timer);pomoState.running=false}
+  else{pomoState.timer=setInterval(pomoTick,1000);pomoState.running=true}
+  pomoRender();
+}
+function pomoTick(){
+  if(pomoState.time>0){pomoState.time--;pomoRender();return}
+  clearInterval(pomoState.timer);pomoState.running=false;
+  if(pomoState.phase==='focus'){
+    pomoState.session++;pomoState.breaks++;
+    pomoState.phase=pomoState.session%4===0?'long':'short';
+    pomoState.time=(pomoState.phase==='long'?POMO.long:POMO.short)*60;
+  } else {
+    pomoState.phase='focus';pomoState.time=POMO.focus*60;
+  }
+  try{new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAA').play()}catch{}
+  pomoRender();
+}
+function pomoReset(){clearInterval(pomoState.timer);pomoState={...pomoState,running:false,phase:'focus',time:POMO.focus*60};pomoRender()}
+function pomoPrev(){clearInterval(pomoState.timer);pomoState={...pomoState,running:false,time:pomoState.phase==='focus'?POMO.focus*60:POMO.short*60};pomoRender()}
+
+// ═══════════════════════════════
+//  CALIFICACIONES
+// ═══════════════════════════════
+function renderGrades(){
+  const avg=grades.length?(grades.reduce((a,g)=>a+g.cal,0)/grades.length).toFixed(1):'—';
+  const avgColor=avg>=9?'var(--green)':avg>=7?'var(--yellow)':'var(--red)';
+  document.getElementById('gradeAvg').style.color=avgColor;
+  document.getElementById('gradeAvg').textContent=avg;
+  if(!grades.length){document.getElementById('gradeList').innerHTML='<div class="empty-state" style="padding:16px"><div class="icon">🎓</div><p>Agrega tus calificaciones</p></div>';return}
+  document.getElementById('gradeList').innerHTML=grades.map(g=>{
+    const c=g.cal>=9?'var(--green)':g.cal>=7?'var(--yellow)':'var(--red)';
+    const w=Math.min(100,g.cal*10);
+    return `<div class="grade-row">
+      <div class="grade-materia">${g.materia}</div>
+      <div style="flex:1;padding:0 12px"><div class="prog-wrap"><div class="prog-fill" style="width:${w}%;background:${c}"></div></div></div>
+      <div class="grade-val" style="color:${c}">${g.cal}</div>
+      <button class="btn-icon" onclick="deleteGrade(${g.id})">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3,6 5,6 21,6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>
+      </button>
+    </div>`;
+  }).join('');
+}
+function deleteGrade(id){grades=grades.filter(x=>x.id!==id);save();renderGrades()}
+
+// ═══════════════════════════════
+//  COMPRAS
+// ═══════════════════════════════
+function renderCompras(){
+  const total=compras.filter(c=>!c.done).reduce((a,c)=>a+(c.precio||0),0);
+  document.getElementById('shopTotal').textContent='$'+total.toLocaleString('es-MX');
+  if(!compras.length){document.getElementById('shopList').innerHTML='<div class="empty-state"><div class="icon">🛒</div><p>La lista está vacía</p></div>';return}
+  const groups={};
+  compras.forEach(c=>{if(!groups[c.cat])groups[c.cat]=[];groups[c.cat].push(c)});
+  document.getElementById('shopList').innerHTML=Object.entries(groups).map(([cat,items])=>`
+    <div class="card">
+      <div class="shop-cat-title">${cat}</div>
+      ${items.map(c=>`
+        <div class="check-row">
+          <div class="chk ${c.done?'done':''}" onclick="toggleCompra(${c.id})"></div>
+          <div class="row-main ${c.done?'done':''}" style="flex:1">${c.texto}</div>
+          ${c.precio?`<span style="font-family:'DM Mono',monospace;font-size:13px;color:var(--txt3)">$${c.precio}</span>`:''}
+          <button class="btn-icon" onclick="deleteCompra(${c.id})">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3,6 5,6 21,6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>
+          </button>
+        </div>`).join('')}
+    </div>`).join('');
+}
+function toggleCompra(id){const c=compras.find(x=>x.id===id);if(c){c.done=!c.done;save();renderCompras()}}
+function deleteCompra(id){compras=compras.filter(x=>x.id!==id);save();renderCompras()}
+
+// ═══════════════════════════════
+//  RECORDATORIOS
+// ═══════════════════════════════
+function renderRecordatorios(){
+  if(!recordatorios.length){document.getElementById('recList').innerHTML='<div class="empty-state" style="padding:16px"><div class="icon">🔔</div><p>Sin recordatorios</p></div>';return}
+  const sorted=[...recordatorios].sort((a,b)=>a.hora.localeCompare(b.hora));
+  document.getElementById('recList').innerHTML=sorted.map(r=>`
+    <div class="check-row">
+      <div style="width:8px;height:8px;border-radius:50%;background:${r.color};flex-shrink:0;margin-top:6px"></div>
+      <div style="font-family:'DM Mono',monospace;font-size:20px;font-weight:500;color:${r.color};min-width:56px">${r.hora}</div>
+      <div class="row-text">
+        <div class="row-main">${r.titulo}</div>
+        ${r.nota?`<div class="row-sub">${r.nota}</div>`:''}
+      </div>
+      <button class="btn-icon" onclick="deleteRec(${r.id})">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3,6 5,6 21,6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>
+      </button>
+    </div>`).join('');
+}
+function deleteRec(id){recordatorios=recordatorios.filter(x=>x.id!==id);save();renderRecordatorios()}
+
+// ═══════════════════════════════
+//  RENDERALL
+// ═══════════════════════════════
+function renderAll(){
+  renderHeader();renderHome();renderTareas();renderHoy();renderHabitos();renderNotas();renderGrades();renderCompras();renderRecordatorios();pomoRender();
+}
+
+// ═══════════════════════════════
+//  FAB
+// ═══════════════════════════════
+function fabAction(){
+  const map={home:'tarea',tareas:'tarea',hoy:'hoy',habitos:'habito',notas:'nota',calificaciones:'calificacion',compras:'compra',recordatorios:'recordatorio'};
+  openSheet(map[currentPage]||'tarea');
+}
+
+// ═══════════════════════════════
+//  SHEETS
+// ═══════════════════════════════
+let sheetData={};
+function openSheet(type, id){
+  sheetData={type,id};
+  const sc=document.getElementById('sheetContent');
+  const overlay=document.getElementById('sheetOverlay');
+
+  if(type==='tarea'||type==='editTarea'){
+    const t=id?tareas.find(x=>x.id===id):null;
+    sc.innerHTML=`
+      <div class="sheet-title">${t?'✏️ Editar tarea':'📚 Nueva tarea'}<button class="btn-icon" onclick="closeSheet()" style="font-size:20px">✕</button></div>
+      <div class="fg"><label>Nombre</label><input id="sf-nombre" type="text" placeholder="Ej: Dimensión 3 – Entrevista" value="${t?.nombre||''}"/></div>
+      <div class="fg"><label>Materia</label><select id="sf-mat">${MATERIAS.map(m=>`<option ${t?.materia===m?'selected':''}>${m}</option>`).join('')}</select></div>
+      <div class="fg"><label>Estado</label><select id="sf-est">
+        <option value="pendiente" ${t?.estado==='pendiente'?'selected':''}>Pendiente</option>
+        <option value="en-proceso" ${t?.estado==='en-proceso'?'selected':''}>En proceso</option>
+        <option value="listo" ${t?.estado==='listo'?'selected':''}>Lista ✓</option>
+      </select></div>
+      <div class="fg"><label>Fecha de entrega</label><input id="sf-fecha" type="date" value="${t?.fecha||''}"/></div>
+      <div class="switch-row"><label>⚡ Urgente</label><button class="switch ${t?.urgente?'on':''}" id="sf-urg" onclick="this.classList.toggle('on')"></button></div>
+      <div class="fg" style="margin-top:6px"><label>Notas adicionales</label><textarea id="sf-notas" placeholder="Detalles, instrucciones...">${t?.notas||''}</textarea></div>
+      <button class="btn-primary" style="margin-top:6px" onclick="saveTareaSheet()">Guardar tarea</button>`;
+  }
+
+  else if(type==='hoy'){
+    sc.innerHTML=`
+      <div class="sheet-title">☀️ Agregar pendiente<button class="btn-icon" onclick="closeSheet()" style="font-size:20px">✕</button></div>
+      <div class="fg"><label>¿Qué tienes que hacer?</label><input id="sf-hoy" type="text" placeholder="Ej: Estudiar, ir al gym..."/></div>
+      <button class="btn-primary" onclick="saveHoySheet()">Agregar</button>`;
+  }
+
+  else if(type==='habito'){
+    const emojis=['🏋️','📖','💧','🧘','🥗','😴','🎨','🎵','🏃','💊','✍️','🌿','🚴','📱','🙏','🫁'];
+    sc.innerHTML=`
+      <div class="sheet-title">🔥 Nuevo hábito<button class="btn-icon" onclick="closeSheet()" style="font-size:20px">✕</button></div>
+      <div class="fg"><label>Nombre</label><input id="sf-hab-n" type="text" placeholder="Ej: Leer 20 minutos"/></div>
+      <div class="fg"><label>Emoji</label>
+        <div style="display:flex;gap:6px;flex-wrap:wrap" id="emojiGrid">
+          ${emojis.map((e,i)=>`<div onclick="pickEmoji(this,'${e}')" style="font-size:24px;cursor:pointer;padding:6px;border-radius:8px;border:2px solid ${i===0?'var(--accent)':'transparent'}" data-e="${e}">${e}</div>`).join('')}
+        </div>
+        <input type="hidden" id="sf-hab-e" value="🏋️"/>
+      </div>
+      <button class="btn-primary" onclick="saveHabitoSheet()">Agregar hábito</button>`;
+  }
+
+  else if(type==='nota'){openNoteEditor(null);return}
+
+  else if(type==='calificacion'){
+    sc.innerHTML=`
+      <div class="sheet-title">🎓 Nueva calificación<button class="btn-icon" onclick="closeSheet()" style="font-size:20px">✕</button></div>
+      <div class="fg"><label>Materia</label><select id="sf-cal-mat">${MATERIAS.map(m=>`<option>${m}</option>`).join('')}</select></div>
+      <div class="fg"><label>Calificación (0-10)</label><input id="sf-cal-v" type="number" min="0" max="10" step="0.1" placeholder="9.5"/></div>
+      <button class="btn-primary" onclick="saveGradeSheet()">Guardar</button>`;
+  }
+
+  else if(type==='compra'){
+    sc.innerHTML=`
+      <div class="sheet-title">🛒 Agregar producto<button class="btn-icon" onclick="closeSheet()" style="font-size:20px">✕</button></div>
+      <div class="fg"><label>Producto</label><input id="sf-comp-n" type="text" placeholder="Ej: Leche, cuaderno..."/></div>
+      <div class="fg"><label>Categoría</label><select id="sf-comp-c">${SHOP_CATS.map(c=>`<option>${c}</option>`).join('')}</select></div>
+      <div class="fg"><label>Precio estimado (opcional)</label><input id="sf-comp-p" type="number" placeholder="0"/></div>
+      <button class="btn-primary" onclick="saveCompraSheet()">Agregar</button>`;
+  }
+
+  else if(type==='recordatorio'){
+    sc.innerHTML=`
+      <div class="sheet-title">⏰ Nuevo recordatorio<button class="btn-icon" onclick="closeSheet()" style="font-size:20px">✕</button></div>
+      <div class="fg"><label>Título</label><input id="sf-rec-t" type="text" placeholder="Ej: Entregar tarea..."/></div>
+      <div class="fg"><label>Hora</label><input id="sf-rec-h" type="time" value="08:00"/></div>
+      <div class="fg"><label>Nota (opcional)</label><input id="sf-rec-n" type="text" placeholder="Detalles..."/></div>
+      <div class="fg"><label>Color</label>
+        <div class="color-grid">${COLORES.map((c,i)=>`<div class="color-dot ${i===0?'sel':''}" style="background:${c}" data-c="${c}" onclick="pickColor(this)"></div>`).join('')}</div>
+        <input type="hidden" id="sf-rec-c" value="${COLORES[0]}"/>
+      </div>
+      <button class="btn-primary" onclick="saveRecSheet()">Guardar</button>`;
+  }
+
+  else if(type==='selTarea'){
+    sc.innerHTML=`
+      <div class="sheet-title">🎯 Seleccionar tarea<button class="btn-icon" onclick="closeSheet()" style="font-size:20px">✕</button></div>
+      ${tareas.filter(t=>t.estado!=='listo').map(t=>`
+        <div class="check-row" onclick="selectPomoTarea(${t.id})" style="cursor:pointer">
+          <div class="row-text"><div class="row-main">${t.nombre}</div><div class="row-sub">${t.materia}</div></div>
+          ${pomoState.taskId===t.id?'<span style="color:var(--accent)">✓</span>':''}
+        </div>`).join('')||'<p style="color:var(--txt3);text-align:center;padding:20px">No hay tareas pendientes</p>'}`;
+  }
+
+  overlay.classList.add('open');
+  setTimeout(()=>{const inp=sc.querySelector('input[type=text],input[type=number]');if(inp)inp.focus()},200);
+}
+
+function closeSheet(){document.getElementById('sheetOverlay').classList.remove('open')}
+function closeSheetOutside(e){if(e.target===document.getElementById('sheetOverlay'))closeSheet()}
+
+function pickEmoji(el,e){document.querySelectorAll('#emojiGrid > div').forEach(d=>d.style.borderColor='transparent');el.style.borderColor='var(--accent)';document.getElementById('sf-hab-e').value=e}
+function pickColor(el){document.querySelectorAll('.color-dot').forEach(d=>d.classList.remove('sel'));el.classList.add('sel');const inp=el.closest('.fg').querySelector('input[type=hidden]');if(inp)inp.value=el.dataset.c}
+function selectPomoTarea(id){pomoState.taskId=id;closeSheet();pomoRender()}
+
+function saveTareaSheet(){
+  const nombre=document.getElementById('sf-nombre').value.trim();
+  if(!nombre)return;
+  const isEdit=sheetData.id&&sheetData.type==='editTarea';
+  const obj={id:isEdit?sheetData.id:Date.now(),nombre,materia:document.getElementById('sf-mat').value,estado:document.getElementById('sf-est').value,urgente:document.getElementById('sf-urg').classList.contains('on'),fecha:document.getElementById('sf-fecha').value,notas:document.getElementById('sf-notas').value};
+  if(isEdit){const i=tareas.findIndex(x=>x.id===sheetData.id);tareas[i]=obj}else tareas.push(obj);
+  save();closeSheet();renderAll();
+}
+function saveHoySheet(){const t=document.getElementById('sf-hoy').value.trim();if(!t)return;hoy.push({id:Date.now(),texto:t,done:false});save();closeSheet();renderHoy()}
+function saveHabitoSheet(){const n=document.getElementById('sf-hab-n').value.trim();if(!n)return;habitos.push({id:Date.now(),nombre:n,emoji:document.getElementById('sf-hab-e').value,dias:{}});save();closeSheet();renderHabitos()}
+function saveGradeSheet(){const m=document.getElementById('sf-cal-mat').value;const v=parseFloat(document.getElementById('sf-cal-v').value);if(isNaN(v))return;const ex=grades.find(g=>g.materia===m);if(ex){ex.cal=Math.min(10,Math.max(0,v))}else grades.push({id:Date.now(),materia:m,cal:Math.min(10,Math.max(0,v))});save();closeSheet();renderGrades()}
+function saveCompraSheet(){const n=document.getElementById('sf-comp-n').value.trim();if(!n)return;const p=parseFloat(document.getElementById('sf-comp-p').value)||0;compras.push({id:Date.now(),texto:n,cat:document.getElementById('sf-comp-c').value,precio:p,done:false});save();closeSheet();renderCompras()}
+function saveRecSheet(){const t=document.getElementById('sf-rec-t').value.trim();if(!t)return;recordatorios.push({id:Date.now(),titulo:t,hora:document.getElementById('sf-rec-h').value,nota:document.getElementById('sf-rec-n').value,color:document.getElementById('sf-rec-c').value});save();closeSheet();renderRecordatorios()}
+
+// ═══════════════════════════════
+//  INIT
+// ═══════════════════════════════
+renderAll();
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>
